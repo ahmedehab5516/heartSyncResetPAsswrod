@@ -75,17 +75,55 @@
     </form>
   </div>
 
-  <script>
-    // Extract token from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+<script>
+  // Extract token from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
 
-    if (!token) {
-      alert('Invalid or missing token.');
-      document.getElementById("resetForm").style.display = "none";
-    } else {
-      document.getElementById("tokenInput").value = token;
+  const form = document.getElementById("resetForm");
+
+  if (!token) {
+    alert("Invalid or missing token.");
+    form.style.display = "none";
+  } else {
+    document.getElementById("tokenInput").value = token;
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const password = form.password.value;
+    const confirm_password = form.confirm_password.value;
+
+    if (password !== confirm_password) {
+      alert("Passwords do not match.");
+      return;
     }
-  </script>
+
+    try {
+      const response = await fetch("https://your-backend-url.com/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
+          password,
+          confirm_password
+        }),
+      });
+
+      const result = await response.text();
+
+      if (response.ok) {
+        form.innerHTML = `<p style="color:#A64D79;font-weight:bold;">🎉 Your password has been successfully updated.</p>`;
+      } else {
+        alert(result || "Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      alert("Network error. Please try again later.");
+      console.error(err);
+    }
+  });
+</script>
+
 </body>
 </html>
